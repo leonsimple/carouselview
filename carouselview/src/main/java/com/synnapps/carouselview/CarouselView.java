@@ -57,6 +57,8 @@ public class CarouselView extends FrameLayout {
 
     private ViewPager.PageTransformer pageTransformer;
 
+    private boolean canLoop = false;
+
     public CarouselView(Context context) {
         super(context);
     }
@@ -229,9 +231,12 @@ public class CarouselView extends FrameLayout {
     private void setData() {
         CarouselPagerAdapter carouselPagerAdapter = new CarouselPagerAdapter(getContext());
         containerViewPager.setAdapter(carouselPagerAdapter);
-        mIndicator.setViewPager(containerViewPager);
-        mIndicator.requestLayout();
-        mIndicator.invalidate();
+        if (canLoop) {
+            mIndicator.setViewPager(containerViewPager, getPageCount());
+            containerViewPager.setCurrentItem(Integer.MAX_VALUE / 2 - Integer.MAX_VALUE / 2 % getPageCount());
+        } else {
+            mIndicator.setViewPager(containerViewPager);
+        }
         containerViewPager.setOffscreenPageLimit(getPageCount());
         playCarousel();
     }
@@ -296,7 +301,7 @@ public class CarouselView extends FrameLayout {
 
         @Override
         public Object instantiateItem(ViewGroup collection, int position) {
-
+            position = position % getPageCount();
             Object objectToReturn;
 
             //Either let user set image to ImageView
@@ -342,7 +347,7 @@ public class CarouselView extends FrameLayout {
 
         @Override
         public int getCount() {
-            return getPageCount();
+            return canLoop ?  Integer.MAX_VALUE : getPageCount();
         }
     }
 
@@ -356,7 +361,7 @@ public class CarouselView extends FrameLayout {
 
         @Override
         public void onPageSelected(int position) {
-
+            Field
         }
 
         @Override
@@ -387,7 +392,7 @@ public class CarouselView extends FrameLayout {
             containerViewPager.post(new Runnable() {
                 public void run() {
 
-                    int nextPage = (containerViewPager.getCurrentItem() + 1) % getPageCount();
+                    int nextPage = containerViewPager.getCurrentItem() + 1 ;
 
                     containerViewPager.setCurrentItem(nextPage, 0 != nextPage || animateOnBoundary);
                 }
@@ -407,9 +412,9 @@ public class CarouselView extends FrameLayout {
         return mPageCount;
     }
 
-    public void setPageCount(int mPageCount) {
+    public void setPageCount(int mPageCount, boolean canLoop) {
         this.mPageCount = mPageCount;
-
+        setCanLoop(canLoop);
         setData();
     }
 
@@ -514,5 +519,13 @@ public class CarouselView extends FrameLayout {
         mIndicator.setStrokeWidth(strokeWidth);
         int padding = (int) strokeWidth;
         mIndicator.setPadding(padding, padding, padding, padding);
+    }
+
+    public boolean isCanLoop() {
+        return canLoop;
+    }
+
+    private void setCanLoop(boolean canLoop) {
+        this.canLoop = canLoop;
     }
 }

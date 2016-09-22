@@ -361,7 +361,7 @@ public class CarouselView extends FrameLayout {
 
         @Override
         public void onPageSelected(int position) {
-            Field
+            
         }
 
         @Override
